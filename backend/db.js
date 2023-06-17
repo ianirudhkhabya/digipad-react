@@ -14,7 +14,7 @@ const mongoURI = "mongodb://localhost:27017";
 
 // New method of connecting to MongoDB (currently used)
 const server = "127.0.0.1:27017"; // REPLACE WITH YOUR DB SERVER
-const database = "test"; // REPLACE WITH YOUR DB NAME
+const database = "digipad"; // REPLACE WITH YOUR DB NAME
 
 const connectDB = async () => {
   try {
