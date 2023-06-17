@@ -2,7 +2,12 @@ const express = require("express");
 const User = require("../models/User");
 const router = express.Router();
 const { body, validationResult } = require("express-validator");
+const bcrypt = require("bcryptjs");
+const jwt = require("jsonwebtoken");
 
+const JWT_SECRET = "DigipadSecret";
+
+// Route 1: Create a User using: POST "/api/auth/createuser". Doesn't require Auth
 router.post(
   "/createuser",
   [
@@ -26,12 +31,20 @@ router.post(
           .json({ error: "Email already taken, enter another email" });
       }
 
+      const salt = await bcrypt.genSalt(10);
+      const Password = await bcrypt.hash(req.body.password, salt);
+
       user = await User.create({
         name: req.body.name,
         email: req.body.email,
-        password: req.body.password,
+        password: Password,
       });
-      res.json(user);
+      jwt.sign({ id: user.id }, JWT_SECRET, (err, authtoken) => {
+        if (err) {
+          throw err;
+        }
+        res.json({ authtoken });
+      });
     } catch (err) {
       console.error(err.message);
       res.status(500).send("Some error occured");
