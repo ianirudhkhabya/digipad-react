@@ -17,7 +17,7 @@ const NoteState = (props) => {
         headers: {
           "Content-Type": "application/json",
           "auth-token":
-            "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY0OGQ3M2ZkOTFiMGM2NGIyMGM0NDNlNyIsImlhdCI6MTY4Nzc5ODk0MH0.8ZtxFqosrw8EXP7o67QxP5vUD3ZKkRO1S1y9DJ_wJvE",
+            "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY0YTMxOWQyNWFhMjMzMzE1NTIxNzBkZSIsImlhdCI6MTY4ODQxMDYzN30.t5nvWegVodscaq8qtbBbeFJ1m_BXEk6kc1Z1k0nkXbE",
         },
       });
       const json = await response.json();
@@ -34,21 +34,16 @@ const NoteState = (props) => {
         headers: {
           "Content-Type": "application/json",
           "auth-token":
-            "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY0OGQ3M2ZkOTFiMGM2NGIyMGM0NDNlNyIsImlhdCI6MTY4Nzc5ODk0MH0.8ZtxFqosrw8EXP7o67QxP5vUD3ZKkRO1S1y9DJ_wJvE",
+            "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY0YTMxOWQyNWFhMjMzMzE1NTIxNzBkZSIsImlhdCI6MTY4ODQxMDYzN30.t5nvWegVodscaq8qtbBbeFJ1m_BXEk6kc1Z1k0nkXbE",
         },
         body: JSON.stringify({ title, description, tag }),
       });
-      const json = await response.json();
 
-      const note = {
-        _id: "649663d21212d86afeabfcbd",
-        user: "648d73fd91b0c64b20c443e7",
-        title: title,
-        description: description,
-        tag: "General",
-        date: "2023-06-24T03:32:34.467Z",
-        __v: 0,
-      };
+      if (!response.ok) {
+        throw new Error("Failed to add note");
+      }
+
+      const note = await response.json();
       setNotes([...notes, note]);
     } catch (error) {
       console.log(error);
@@ -62,7 +57,7 @@ const NoteState = (props) => {
         headers: {
           "Content-Type": "application/json",
           "auth-token":
-            "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY0OGQ3M2ZkOTFiMGM2NGIyMGM0NDNlNyIsImlhdCI6MTY4Nzc5ODk0MH0.8ZtxFqosrw8EXP7o67QxP5vUD3ZKkRO1S1y9DJ_wJvE",
+            "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY0YTMxOWQyNWFhMjMzMzE1NTIxNzBkZSIsImlhdCI6MTY4ODQxMDYzN30.t5nvWegVodscaq8qtbBbeFJ1m_BXEk6kc1Z1k0nkXbE",
         },
       });
 
@@ -80,7 +75,7 @@ const NoteState = (props) => {
         headers: {
           "Content-Type": "application/json",
           "auth-token":
-            "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY0OGQ3M2ZkOTFiMGM2NGIyMGM0NDNlNyIsImlhdCI6MTY4NzAzMDkxMn0.gKft6Y8trXLWw0ddzXonS4DeIaQ7cW-AxgsGoUHcsd4",
+            "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY0YTMxOWQyNWFhMjMzMzE1NTIxNzBkZSIsImlhdCI6MTY4ODQxMDYzN30.t5nvWegVodscaq8qtbBbeFJ1m_BXEk6kc1Z1k0nkXbE",
         },
         body: JSON.stringify({ title, description, tag }),
       });
