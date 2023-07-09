@@ -8,14 +8,14 @@ const SignUp = (props) => {
     password: "",
     cpassword: "",
   });
-  let navigateTo = useNavigate();
+  const navigateTo = useNavigate();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     const { name, email, password } = credentials;
     try {
       const response = await fetch(
-        `http://localhost:5000/api/auth/createuser`,
+        "http://localhost:5000/api/auth/createuser",
         {
           method: "POST",
           headers: {
@@ -31,7 +31,7 @@ const SignUp = (props) => {
         navigateTo("/");
         props.showAlert("success", "Account created successfully");
       } else {
-        props.showAlert("danger", "Invalid Details");
+        props.showAlert("danger", "Invalid details");
       }
     } catch (error) {
       console.log(error);
@@ -43,8 +43,9 @@ const SignUp = (props) => {
   };
 
   return (
-    <div className="container mt-3">
-      <form className="my-3" onSubmit={handleSubmit}>
+    <div className="container mt-2">
+      <h2>Create an account to use Digipad</h2>
+      <form className="my-3 mx-2" onSubmit={handleSubmit}>
         <div className="mb-3">
           <label htmlFor="name" className="form-label">
             Name
@@ -55,7 +56,8 @@ const SignUp = (props) => {
             id="name"
             name="name"
             onChange={onChange}
-            aria-describedby="emailHelp"
+            aria-describedby="nameHelp"
+            required
           />
         </div>
         <div className="mb-3">
@@ -69,6 +71,7 @@ const SignUp = (props) => {
             name="email"
             onChange={onChange}
             aria-describedby="emailHelp"
+            required
           />
         </div>
         <div className="mb-3">

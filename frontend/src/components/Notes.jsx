@@ -1,12 +1,19 @@
 import React, { useContext, useEffect, useRef, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import noteContext from "../context/notes/noteContext";
 import NoteItem from "./NoteItem";
 import AddNote from "./AddNote";
 
 const Notes = (props) => {
   const { notes, getNotes, editNote } = useContext(noteContext);
+  const navigateTo = useNavigate();
+
   useEffect(() => {
-    getNotes();
+    if (!localStorage.getItem("token")) {
+      navigateTo("/login");
+    } else {
+      getNotes();
+    }
   }, []);
 
   const [note, setNote] = useState({
@@ -76,7 +83,7 @@ const Notes = (props) => {
             <div className="modal-body">
               <form className="mb-3">
                 <div className="mb-3">
-                  <label htmlFor="title" className="form-label">
+                  <label htmlFor="etitle" className="form-label">
                     <h4>Title</h4>
                   </label>
                   <input
@@ -90,7 +97,7 @@ const Notes = (props) => {
                   />
                 </div>
                 <div className="mb-3">
-                  <label htmlFor="description" className="form-label">
+                  <label htmlFor="edescription" className="form-label">
                     <h4>Description</h4>
                   </label>
                   <input
@@ -103,7 +110,7 @@ const Notes = (props) => {
                   />
                 </div>
                 <div className="mb-3">
-                  <label htmlFor="tag" className="form-label">
+                  <label htmlFor="etag" className="form-label">
                     <h4>Tag</h4>
                   </label>
                   <input

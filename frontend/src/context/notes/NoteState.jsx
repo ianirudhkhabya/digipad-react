@@ -3,8 +3,7 @@ import NoteContext from "./noteContext";
 
 const NoteState = (props) => {
   const host = "http://localhost:5000";
-  const notesInitial = [];
-  const [notes, setNotes] = useState(notesInitial);
+  const [notes, setNotes] = useState([]);
 
   useEffect(() => {
     getNotes();
@@ -16,10 +15,14 @@ const NoteState = (props) => {
         method: "GET",
         headers: {
           "Content-Type": "application/json",
-          "auth-token":
-            "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY0YTMxOWQyNWFhMjMzMzE1NTIxNzBkZSIsImlhdCI6MTY4ODQxMDYzN30.t5nvWegVodscaq8qtbBbeFJ1m_BXEk6kc1Z1k0nkXbE",
+          "auth-token": localStorage.getItem("token"),
         },
       });
+
+      if (!response.ok) {
+        throw new Error("Failed to fetch notes");
+      }
+
       const json = await response.json();
       setNotes(json);
     } catch (error) {
@@ -33,8 +36,7 @@ const NoteState = (props) => {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          "auth-token":
-            "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY0YTMxOWQyNWFhMjMzMzE1NTIxNzBkZSIsImlhdCI6MTY4ODQxMDYzN30.t5nvWegVodscaq8qtbBbeFJ1m_BXEk6kc1Z1k0nkXbE",
+          "auth-token": localStorage.getItem("token"),
         },
         body: JSON.stringify({ title, description, tag }),
       });
@@ -56,8 +58,7 @@ const NoteState = (props) => {
         method: "DELETE",
         headers: {
           "Content-Type": "application/json",
-          "auth-token":
-            "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY0YTMxOWQyNWFhMjMzMzE1NTIxNzBkZSIsImlhdCI6MTY4ODQxMDYzN30.t5nvWegVodscaq8qtbBbeFJ1m_BXEk6kc1Z1k0nkXbE",
+          "auth-token": localStorage.getItem("token"),
         },
       });
 
@@ -74,8 +75,7 @@ const NoteState = (props) => {
         method: "PUT",
         headers: {
           "Content-Type": "application/json",
-          "auth-token":
-            "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY0YTMxOWQyNWFhMjMzMzE1NTIxNzBkZSIsImlhdCI6MTY4ODQxMDYzN30.t5nvWegVodscaq8qtbBbeFJ1m_BXEk6kc1Z1k0nkXbE",
+          "auth-token": localStorage.getItem("token"),
         },
         body: JSON.stringify({ title, description, tag }),
       });
@@ -84,9 +84,9 @@ const NoteState = (props) => {
         if (note._id === id) {
           return {
             ...note,
-            title: title,
-            description: description,
-            tag: tag,
+            title,
+            description,
+            tag,
           };
         }
         return note;
