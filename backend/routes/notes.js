@@ -10,7 +10,9 @@ router.get("/fetchallnotes", fetchuser, async (req, res) => {
     const notes = await Note.find({ user: req.user.id });
     res.json(notes);
   } catch (error) {
-    res.status(500).send("Internal Server Error");
+    res
+      .status(500)
+      .json({ error: "Internal Server Error", details: error.message });
   }
 });
 
@@ -25,85 +27,77 @@ router.post(
     }),
   ],
   async (req, res) => {
-    const errors = validationResult(req);
-    if (!errors.isEmpty()) {
-      return res.status(400).json({ errors: errors.array() });
-    }
-
     try {
+      const errors = validationResult(req);
+      if (!errors.isEmpty()) {
+        return res.status(400).json({ errors: errors.array() });
+      }
+
       const { title, description, tag } = req.body;
       if (!title || !description) {
         return res.status(400).json({ error: "Please add all the fields" });
       }
-      const note = new Note({
-        user: req.user.id,
-        title,
-        description,
-        tag,
-      });
+
+      const note = new Note({ user: req.user.id, title, description, tag });
       const savedNote = await note.save();
       res.json(savedNote);
     } catch (error) {
-      res.status(500).send("Internal Server Error");
+      res
+        .status(500)
+        .json({ error: "Internal Server Error", details: error.message });
     }
   }
 );
 
 // Route 3: Update an existing note using: PUT "/api/notes/updatenote". Login required
 router.put("/updatenote/:id", fetchuser, async (req, res) => {
-  const { title, description, tag } = req.body;
   try {
-    // Create a newNote object
+    const { title, description, tag } = req.body;
     const newNote = {};
-    if (title) {
-      newNote.title = title;
-    }
-    if (description) {
-      newNote.description = description;
-    }
-    if (tag) {
-      newNote.tag = tag;
-    }
 
-    // Find the note to be updated and update it
-    let note = await Note.findById(req.params.id);
-    if (!note) {
-      return res.status(404).send("Not Found");
-    }
+    if (title) newNote.title = title;
+    if (description) newNote.description = description;
+    if (tag) newNote.tag = tag;
 
-    if (note.user.toString() !== req.user.id) {
-      return res.status(401).send("Not Allowed");
-    }
-
-    note = await Note.findByIdAndUpdate(
-      req.params.id,
+    const note = await Note.findOneAndUpdate(
+      { _id: req.params.id, user: req.user.id },
       { $set: newNote },
       { new: true }
     );
-    res.json({ note });
-  } catch (err) {
-    {
-      res.status(500).send("Internal Server Error");
+
+    if (!note) {
+      return res
+        .status(404)
+        .json({ error: "Note not found or you don't have permission" });
     }
+
+    res.json({ note });
+  } catch (error) {
+    res
+      .status(500)
+      .json({ error: "Internal Server Error", details: error.message });
   }
 });
 
 // Route 4: Delete an existing note using: DELETE "/api/notes/deletenote". Login required
 router.delete("/deletenote/:id", fetchuser, async (req, res) => {
   try {
-    let note = await Note.findById(req.params.id);
+    const note = await Note.findOneAndDelete({
+      _id: req.params.id,
+      user: req.user.id,
+    });
+
     if (!note) {
-      return res.status(404).send("Not Found");
+      return res
+        .status(404)
+        .json({ error: "Note not found or you don't have permission" });
     }
 
-    if (note.user.toString() !== req.user.id) {
-      return res.status(401).send("Not Allowed");
-    }
-
-    note = await Note.findByIdAndDelete(req.params.id);
-    res.json({ Success: "Note deleted successfully", note: note });
-  } catch (err) {
-    res.status(500).send("Internal Server Error");
+    res.json({ success: "Note deleted successfully", note });
+  } catch (error) {
+    res
+      .status(500)
+      .json({ error: "Internal Server Error", details: error.message });
   }
 });
 

@@ -1,10 +1,10 @@
-import React, { useContext, useEffect, useRef, useState } from "react";
+import { useContext, useEffect, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import noteContext from "../context/notes/noteContext";
 import NoteItem from "./NoteItem";
 import AddNote from "./AddNote";
 
-const Notes = (props) => {
+const Notes = ({ showAlert }) => {
   const { notes, getNotes, editNote } = useContext(noteContext);
   const navigateTo = useNavigate();
 
@@ -43,12 +43,12 @@ const Notes = (props) => {
     e.preventDefault();
     editNote(note.id, note.etitle, note.edescription, note.etag);
     refClose.current.click();
-    props.showAlert("success", "Updated successfully");
+    showAlert("success", "Updated successfully");
   };
 
   return (
     <>
-      <AddNote showAlert={props.showAlert} />
+      <AddNote showAlert={showAlert} />
 
       <button
         type="button"
@@ -153,7 +153,7 @@ const Notes = (props) => {
               key={note._id}
               note={note}
               updateNote={updateNote}
-              showAlert={props.showAlert}
+              showAlert={showAlert}
             />
           ))
         ) : (

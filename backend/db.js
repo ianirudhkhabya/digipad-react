@@ -18,12 +18,12 @@ const database = "digipad"; // REPLACE WITH YOUR DB NAME
 
 const connectDB = async () => {
   try {
-    await mongoose.connect(`mongodb://${server}/${database}`, {
+    mongoose.connect(`mongodb://${server}/${database}`, {
       useNewUrlParser: true,
     });
     console.log("MongoDB is connected");
   } catch (err) {
-    console.log(err);
+    console.error("MongoDB connection error:", err.message);
   }
 };
 

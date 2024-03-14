@@ -6,11 +6,16 @@ const bcrypt = require("bcryptjs");
 var jwt = require("jsonwebtoken");
 var fetchuser = require("../middleware/fetchuser");
 
-const JWT_SECRET = "DigipadSecret";
+const JWT_SECRET = process.env.JWT_SECRET || "DigipadSecret";
+const CREATE_USER_ROUTE = "/createuser";
+const LOGIN_ROUTE = "/login";
+const GET_USER_ROUTE = "/getuser";
+
+router.use(express.json());
 
 // Route 1: Create a User using: POST "/api/auth/createuser". Doesn't require Auth
 router.post(
-  "/createuser",
+  CREATE_USER_ROUTE,
   [
     body("name", "Name should be valid!").isLength({ min: 3 }),
     body("email", "Email should be valid!").isEmail(),
@@ -19,18 +24,18 @@ router.post(
     }),
   ],
   async (req, res) => {
-    let success = false;
-    const errors = validationResult(req);
-    if (!errors.isEmpty()) {
-      return res.status(400).json({ success, errors: errors.array() });
-    }
-
     try {
-      let user = await User.findOne({ success, email: req.body.email });
+      const errors = validationResult(req);
+      if (!errors.isEmpty()) {
+        return res.status(400).json({ success: false, errors: errors.array() });
+      }
+
+      let user = await User.findOne({ email: req.body.email });
       if (user) {
-        return res
-          .status(400)
-          .json({ error: "Email already taken, enter another email" });
+        return res.status(400).json({
+          success: false,
+          error: "Email already taken, enter another email",
+        });
       }
 
       const salt = await bcrypt.genSalt(10);
@@ -41,64 +46,66 @@ router.post(
         email: req.body.email,
         password: hashedPassword,
       });
+
       const authToken = jwt.sign({ id: user.id }, JWT_SECRET);
-      success = true;
-      res.json({ success, authToken });
-    } catch (err) {
-      res.status(500).send("Internal Server Error");
+      res.json({ success: true, authToken });
+    } catch (error) {
+      console.error(error);
+      res.status(500).json({ success: false, error: "Internal Server Error" });
     }
   }
 );
 
 // Route 2: Authenticate a User using: POST "/api/auth/login". No login required
 router.post(
-  "/login",
+  LOGIN_ROUTE,
   [
     body("email", "Enter correct email").isEmail(),
     body("password", "Password can not be blank").exists(),
   ],
   async (req, res) => {
-    let success = false;
-    const errors = validationResult(req);
-    if (!errors.isEmpty()) {
-      return res.status(400).json({ errors: errors.array() });
-    }
-
-    const { email, password } = req.body;
     try {
+      const errors = validationResult(req);
+      if (!errors.isEmpty()) {
+        return res.status(400).json({ success: false, errors: errors.array() });
+      }
+
+      const { email, password } = req.body;
       let user = await User.findOne({ email });
+
       if (!user) {
         return res
           .status(400)
-          .json({ success, error: "Use correct credentials" });
+          .json({ success: false, error: "Use correct credentials" });
       }
 
       const passwordCompare = await bcrypt.compare(password, user.password);
       if (!passwordCompare) {
         return res
           .status(400)
-          .json({ success, error: "Use correct credentials" });
+          .json({ success: false, error: "Use correct credentials" });
       }
 
       const authToken = jwt.sign({ id: user.id }, JWT_SECRET);
-      success = true;
-      res.json({ success, authToken });
-    } catch (err) {
-      res.status(500).send("Internal Server Error");
+      res.json({ success: true, authToken });
+    } catch (error) {
+      console.error(error);
+      res.status(500).json({ success: false, error: "Internal Server Error" });
     }
   }
 );
 
 // Route 3: Get logged-in User Details using: POST "/api/auth/getuser". Login required
-router.post("/getuser", fetchuser, async (req, res) => {
+router.post(GET_USER_ROUTE, fetchuser, async (req, res) => {
   try {
     const user = await User.findById(req.user.id).select("-password");
     if (!user) {
-      return res.status(400).json({ error: "User not found" });
+      return res.status(400).json({ success: false, error: "User not found" });
     }
     res.json(user);
-  } catch (err) {
-    res.status(500).send("Internal Server Error");
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ success: false, error: "Internal Server Error" });
   }
 });
 

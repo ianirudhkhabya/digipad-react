@@ -1,9 +1,8 @@
-import React, { useContext } from "react";
+import { useContext } from "react";
 import noteContext from "../context/notes/noteContext";
 
-const NoteItem = (props) => {
+const NoteItem = ({ note, updateNote, showAlert }) => {
   const { deleteNote } = useContext(noteContext);
-  const { note, updateNote, showAlert } = props;
 
   const handleDelete = () => {
     deleteNote(note._id);

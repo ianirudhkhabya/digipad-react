@@ -1,6 +1,4 @@
-import React from "react";
-
-function Alert(props) {
+function Alert({ alert }) {
   const capitalize = (word) => {
     if (word === "danger") {
       word = "error";
@@ -11,12 +9,12 @@ function Alert(props) {
 
   return (
     <div style={{ height: "47px" }}>
-      {props.alert && (
+      {alert && (
         <div
-          className={`alert alert-${props.alert.type} alert-dismissible fade show`}
+          className={`alert alert-${alert.type} alert-dismissible fade show`}
           role="alert"
         >
-          <strong>{capitalize(props.alert.type)}</strong>: {props.alert.msg}
+          <strong>{capitalize(alert.type)}</strong>: {alert.msg}
           <button
             type="button"
             className="btn-close"
